@@ -22,23 +22,50 @@ Progress = Callable[[int, int, "Profile | None"], None]
 _CONFIDENCE_ORDER = {"high": 0, "medium": 1, "low": 2}
 
 
-async def check(client: httpx.AsyncClient, site: Site, username: str, timeout: float) -> tuple[Profile | None, bool]:
-    """Tries one username on one site. Returns (profile or None, did the site answer?)."""
-    account = site.prepare(username)
+def profile_exists(site: Site, status: int, text: str) -> bool | None:
+    """Reads a site's answer with its rule. None means the answer can't be trusted (captcha, rate limit...)."""
+    if any(e in text for e in site.error_strings) or status == 429:
+        return None
+    if site.mode == "string":
+        return status == site.exists_code and site.exists_string in text and not any(a in text for a in site.absence)
+    ok = 200 <= status < 300 and status not in site.error_codes
+    if site.mode in ("status", "redirect"):
+        return ok
+    if site.mode == "message":
+        if any(a in text for a in site.absence):
+            return False
+        if site.presence:
+            return any(p in text for p in site.presence)
+        # Only absence texts to go on: an error status means no profile even if the page wording changed.
+        return status < 400
+    return False
+
+
+async def fetch(client: httpx.AsyncClient, site: Site, account: str, timeout: float) -> httpx.Response:
     url = site.check_url.replace("{account}", account)
+    body = site.body.replace("{account}", account) if site.body else None
+    return await client.request(site.method, url, content=body, headers=site.headers, timeout=timeout,
+                                follow_redirects=site.mode != "redirect")
+
+
+async def check(client: httpx.AsyncClient, site: Site, username: str, timeout: float) -> tuple[Profile | None, bool]:
+    """Tries one username on one site. Returns (profile or None, did the site give a usable answer?)."""
+    account = site.prepare(username)
+    if not site.accepts(account):
+        return None, True  # the site can't have this username (too short, invalid characters...)
     try:
-        if site.post_body:
-            r = await client.post(url, content=site.post_body.replace("{account}", account),
-                                  headers=site.headers, timeout=timeout)
-        else:
-            r = await client.get(url, headers=site.headers, timeout=timeout)
-    except (httpx.HTTPError, UnicodeError):
+        r = await fetch(client, site, account, timeout)
+    except (httpx.HTTPError, UnicodeError, ValueError):
         return None, False
-    text = r.text
-    if r.status_code != site.exists_code or site.exists_string not in text:
+    text = r.text if site.method != "HEAD" else ""
+    exists = profile_exists(site, r.status_code, text)
+    if exists is None:
+        return None, False
+    if not exists:
         return None, True
     details, source = extract(site.name, text, account)
-    profile = Profile(site=site.name, url=site.url(account), username=account, category=site.category, source=source)
+    profile = Profile(site=site.name, url=site.url(account), username=account, category=site.category,
+                      source=source, found_by=site.source)
     for key, value in details.items():
         if value not in (None, "", [], {}):
             setattr(profile, key, value)
@@ -51,6 +78,7 @@ async def investigate_async(
     usernames: Iterable[str] | None = None,
     categories: set[str] | None = None,
     sites: set[str] | None = None,
+    sources: set[str] | None = None,
     pivot: bool = True,
     max_pivots: int = 5,
     concurrency: int = 50,
@@ -62,7 +90,7 @@ async def investigate_async(
     started = time.perf_counter()
     is_name = looks_like_name(target)
     to_try = list(usernames) if usernames else (username_variants(target) if is_name else [target.strip().lstrip("@")])
-    site_list = load_sites(categories, sites)
+    site_list = load_sites(categories, sites, sources)
     dossier = Dossier(target=target, usernames_tried=[])
 
     own_client = client is None
@@ -125,7 +153,8 @@ def investigate(target: str, **options) -> Dossier:
         for profile in dossier.profiles:
             print(profile.site, profile.url)
 
-    Options: ``categories`` and ``sites`` (filters), ``pivot`` (follow accounts mentioned on the profiles),
+    Options: ``categories``, ``sites`` and ``sources`` (filters; sources are "whatsmyname", "sherlock",
+    "maigret"), ``pivot`` (follow accounts mentioned on the profiles),
     ``max_pivots``, ``concurrency``, ``timeout`` and ``progress`` (called after every check).
     """
     try:

@@ -11,8 +11,9 @@ from caramelo.extractors import extract, from_page
 from caramelo.sites import BLOCKED_CATEGORIES, Site, load_sites
 
 SITE = Site(
-    name="Example", check_url="https://ex.com/u/{account}", category="social",
-    exists_code=200, exists_string="profile-ok", missing_code=404, missing_string="not found",
+    name="Example", source="whatsmyname", category="social", mode="string",
+    check_url="https://ex.com/u/{account}", profile_url="https://ex.com/u/{account}",
+    exists_code=200, exists_string="profile-ok",
 )
 
 

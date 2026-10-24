@@ -22,7 +22,6 @@ SOFTWARE.
 
 ---
 
-The site list in src/rastro/dados/wmn-data.json comes from the WhatsMyName
-project (https://github.com/WebBreacher/WhatsMyName), Copyright (C) 2015-2026
-Micah Hoffman, licensed under Creative Commons Attribution-ShareAlike 4.0
-International (https://creativecommons.org/licenses/by-sa/4.0/).
+The site list in src/caramelo/data/sites.json is built from three projects;
+see THIRD_PARTY_NOTICES.md for their copyright notices and licenses:
+WhatsMyName (CC BY-SA 4.0), Sherlock (MIT) and Maigret (MIT).

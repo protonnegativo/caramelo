@@ -38,7 +38,8 @@ def to_terminal(d: Dossier, console: Console | None = None) -> None:
         table.add_column("Details", overflow="fold")
         table.add_column("", no_wrap=True)
         for p in profiles:
-            table.add_row(p.site, p.url, _short_details(p), f"[{_CONFIDENCE_COLOR[p.confidence]}]{p.confidence}")
+            table.add_row(p.site, p.url, _short_details(p),
+                          f"[{_CONFIDENCE_COLOR[p.confidence]}]{p.confidence}[/]\n[dim]{p.found_by}")
         console.print()
         console.print(table)
     if any(p.confidence != "high" for p in d.profiles):
@@ -70,7 +71,8 @@ def to_html(d: Dossier) -> str:
         avatar = (f'<img src="{e(p.avatar)}" alt="" loading="lazy" referrerpolicy="no-referrer">'
                   if p.avatar and p.avatar.startswith("https://") else '<div class="no-avatar"></div>')
         rows = [f"<dt>{label}</dt><dd>{e(str(v))}</dd>" for label, v in (
-            ("Name", p.name), ("Location", p.location), ("Since", p.created_at), ("Followers", p.followers), ("Via", p.via)) if v]
+            ("Name", p.name), ("Location", p.location), ("Since", p.created_at), ("Followers", p.followers), ("Via", p.via),
+            ("Rule from", p.found_by)) if v]
         bio = f'<p class="bio">{e(p.bio)}</p>' if p.bio else ""
         links = "".join(f'<a href="{e(l)}" rel="noreferrer noopener" target="_blank">{e(l)}</a>' for l in p.links[:6])
         return (f'<article class="profile c-{p.confidence}">{avatar}<div class="body">'

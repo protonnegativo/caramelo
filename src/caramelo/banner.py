@@ -91,7 +91,7 @@ def _hud(sites: int | None, version: str | None) -> list[Text]:
         return Text("│ " + text.ljust(_HUD_WIDTH - 1) + "│", style=style)
 
     bar = "█" * 17 + "░" * 3
-    reach = f"{sites} sites · 0 API keys" if sites else "hundreds of sites · 0 API keys"
+    reach = f"{sites} sites · 0 API keys" if sites else "thousands of sites · 0 API keys"
     return [
         Text("╭─ SUBJECT " + "─" * (_HUD_WIDTH - 10) + "╮", style="#ffb000"),
         row("ID ........ CARAMELO // vira-lata", "#ffcc66"),

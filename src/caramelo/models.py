@@ -29,6 +29,8 @@ class Profile:
     extra: dict[str, object] = field(default_factory=dict)
     #: Where the details came from: "page" (meta tags) or the extractor name (e.g. "api-github").
     source: str = "page"
+    #: Which site list supplied the rule that found this profile: "whatsmyname", "sherlock" or "maigret".
+    found_by: str = ""
     #: Username that led to this profile, when it differs from the target (e.g. found through a pivot).
     via: str | None = None
 
