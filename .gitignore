@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+# Generated dossiers may contain personal data: never commit them
+dossie*.html
+dossie*.json
