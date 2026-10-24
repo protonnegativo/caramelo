@@ -22,7 +22,7 @@ caramelo johndoe --silent            # just "site<TAB>url" lines, for scripts an
   <img src="docs/demo.gif" alt="Installing Caramelo with pipx, searching for a username and using --silent in a real terminal" width="900">
 </p>
 
-<sub>Recorded in a real terminal with <a href="https://github.com/charmbracelet/vhs">VHS</a> (<code>vhs docs/demo.tape</code>).</sub>
+<sub>Recorded in a real terminal with <a href="https://github.com/charmbracelet/vhs">VHS</a> (<code>vhs docs/demo.tape</code>). The waits (install and searches) are fast-forwarded; typing and output play at real speed.</sub>
 
 ## Install
 

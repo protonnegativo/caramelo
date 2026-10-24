@@ -6,6 +6,12 @@
 #     vhs docs/demo.tape
 #
 # The searches hit the real sites, so results and timings change from one recording to the next.
+#
+# Then fast-forward the waits (install, progress bar, silent search). Find the time ranges by watching the
+# GIF; these matched the current recording:
+#
+#     python scripts/speedup_gif.py docs/demo.gif docs/demo.gif \
+#         --wait 3.1-13.88:8 --wait 18.4-37.3:6 --wait 43.4-56.6:10 --hold-end 1.5
 
 Output docs/demo.gif
 
