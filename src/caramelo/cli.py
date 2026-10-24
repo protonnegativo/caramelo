@@ -7,6 +7,7 @@ from contextlib import nullcontext
 from pathlib import Path
 
 from rich.console import Console
+from rich.markup import escape
 from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn, TimeElapsedColumn
 
 from . import __version__, banner
@@ -57,6 +58,9 @@ def main(argv: list[str] | None = None) -> int:
     if not a.target:
         p.print_help()
         return 2
+    if not a.target.strip().lstrip("@").strip():
+        Console(stderr=True).print("Give a username (e.g. johndoe) or a quoted name (e.g. \"Maria Souza\").")
+        return 2
 
     categories = set(a.category) if a.category else None
     sites = set(a.site) if a.site else None
@@ -70,7 +74,7 @@ def main(argv: list[str] | None = None) -> int:
         TextColumn("[bold]{task.description}"), BarColumn(), MofNCompleteColumn(),
         TextColumn("· {task.fields[found]} profiles"), TimeElapsedColumn(), console=err, transient=True)
     with bar or nullcontext():
-        task = bar.add_task(f"Sniffing out {a.target}", total=total_sites, found=0) if bar else None
+        task = bar.add_task(f"Sniffing out {escape(a.target)}", total=total_sites, found=0) if bar else None
         found = 0
 
         def progress(done: int, total: int, profile) -> None:
@@ -94,7 +98,7 @@ def main(argv: list[str] | None = None) -> int:
         to_terminal(dossier)
     if a.html:
         Path(a.html).write_text(to_html(dossier), encoding="utf-8")
-        err.print(f"\nReport saved to {Path(a.html).resolve()}")
+        err.print(f"\nReport saved to {escape(str(Path(a.html).resolve()))}")
     return 0
 
 

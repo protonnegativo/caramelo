@@ -71,7 +71,7 @@ def _portrait() -> list[Text]:
         line.append(side, style=_FRAME)
         lines.append(line)
     lines.append(Text("┗━━" + " " * (w - 4) + "━━┛", style=_FRAME))
-    lines.append(Text(" TGT-LOCK ▸ 0x" + "CARAMELO".encode().hex(), style="#ff5a00"))
+    lines.append(Text(" TGT-LOCK ▸ 0x" + b"CARAMELO".hex(), style="#ff5a00"))
     return lines
 
 

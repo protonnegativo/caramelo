@@ -9,7 +9,7 @@ import html
 import json
 import re
 from datetime import datetime, timezone
-from typing import Callable
+from collections.abc import Callable
 
 Details = dict  # Profile fields: name, bio, avatar, location, created_at, followers, links, linked_accounts, extra
 

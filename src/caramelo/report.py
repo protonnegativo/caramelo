@@ -5,6 +5,7 @@ import html
 from datetime import datetime
 
 from rich.console import Console
+from rich.markup import escape
 from rich.table import Table
 
 from .models import Dossier, Profile
@@ -13,13 +14,15 @@ _CONFIDENCE_COLOR = {"high": "green", "medium": "yellow", "low": "red"}
 
 
 def to_terminal(d: Dossier, console: Console | None = None) -> None:
+    # Everything that comes from the sites (names, bios, URLs) is escaped: a "[/bold]" in someone's bio
+    # would otherwise be read as rich markup and break the report.
     console = console or Console()
     console.print()
-    console.rule(f"[bold]Dossier: {d.target}")
+    console.rule(f"[bold]Dossier: {escape(d.target)}")
     console.print(f"{len(d.profiles)} profiles from {d.checks} checks · {d.duration_s}s"
                   + (f" · {len(d.no_response)} without response" if d.no_response else ""))
     if len(d.usernames_tried) > 1:
-        console.print(f"[dim]Usernames tried: {', '.join(d.usernames_tried)}")
+        console.print(f"[dim]Usernames tried: {escape(', '.join(d.usernames_tried))}")
 
     summary = [("Names", d.names()[:5]), ("Locations", d.locations()[:5]), ("Links", d.links()[:8])]
     accounts = d.linked_accounts()
@@ -29,16 +32,16 @@ def to_terminal(d: Dossier, console: Console | None = None) -> None:
         if items:
             console.print(f"\n[bold]{title}[/]")
             for item in items:
-                console.print(f"  • {item}", highlight=False)
+                console.print(f"  • {escape(item)}", highlight=False)
 
     for category, profiles in d.by_category().items():
-        table = Table(title=f"{category} ({len(profiles)})", title_justify="left", expand=True)
+        table = Table(title=f"{escape(category)} ({len(profiles)})", title_justify="left", expand=True)
         table.add_column("Site", style="bold", no_wrap=True)
         table.add_column("Profile", overflow="fold")
         table.add_column("Details", overflow="fold")
         table.add_column("", no_wrap=True)
         for p in profiles:
-            table.add_row(p.site, p.url, _short_details(p),
+            table.add_row(escape(p.site), escape(p.url), escape(_short_details(p)),
                           f"[{_CONFIDENCE_COLOR[p.confidence]}]{p.confidence}[/]\n[dim]{p.found_by}")
         console.print()
         console.print(table)

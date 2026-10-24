@@ -9,26 +9,45 @@ description = "Passive username OSINT: find someone's public profiles on thousan
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
+# The bundled site list carries third-party data (CC BY-SA 4.0 and MIT): its notices ship with every install.
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
 authors = [{ name = "Dennys Kaluzny Pereira" }]
-keywords = ["osint", "username", "reconnaissance", "security", "sherlock", "whatsmyname"]
+keywords = ["osint", "username", "reconnaissance", "security", "sherlock", "whatsmyname", "maigret"]
 classifiers = [
-  "Programming Language :: Python :: 3",
-  "Topic :: Security",
+  "Development Status :: 3 - Alpha",
   "Environment :: Console",
+  "Intended Audience :: Information Technology",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Security",
 ]
 dependencies = [
   "httpx>=0.27,<1",
   "rich>=13",
 ]
 
+[project.urls]
+Homepage = "https://github.com/protonnegativo/caramelo"
+Issues = "https://github.com/protonnegativo/caramelo/issues"
+
 [project.optional-dependencies]
-dev = ["pytest>=8", "respx>=0.21"]
+dev = ["pytest>=8", "respx>=0.21", "ruff", "build"]
 
 [project.scripts]
 caramelo = "caramelo.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/caramelo"]
+
+[tool.hatch.build.targets.sdist]
+# The README images (banner, 1.5 MB demo GIF) aren't needed to build or install.
+exclude = ["/docs"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

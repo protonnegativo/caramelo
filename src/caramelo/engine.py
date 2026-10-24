@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import time
-from typing import Callable, Iterable
+from collections.abc import Callable, Iterable
 
 import httpx
 
@@ -55,7 +55,7 @@ async def check(client: httpx.AsyncClient, site: Site, username: str, timeout: f
         return None, True  # the site can't have this username (too short, invalid characters...)
     try:
         r = await fetch(client, site, account, timeout)
-    except (httpx.HTTPError, UnicodeError, ValueError):
+    except Exception:  # noqa: BLE001 - one broken site rule (bad URL, odd TLS, weird encoding) must not end the search
         return None, False
     text = r.text if site.method != "HEAD" else ""
     exists = profile_exists(site, r.status_code, text)
@@ -90,6 +90,9 @@ async def investigate_async(
     started = time.perf_counter()
     is_name = looks_like_name(target)
     to_try = list(usernames) if usernames else (username_variants(target) if is_name else [target.strip().lstrip("@")])
+    to_try = [u.strip() for u in to_try if u and u.strip()]
+    if not to_try:
+        raise ValueError(f"nothing to search for in target {target!r}: give a username or a name")
     site_list = load_sites(categories, sites, sources)
     dossier = Dossier(target=target, usernames_tried=[])
 
@@ -144,7 +147,7 @@ async def investigate_async(
 
 
 def investigate(target: str, **options) -> Dossier:
-    """Finds the public profiles of a username (or a real name, e.g. "Maria Souza") on hundreds of sites.
+    """Finds the public profiles of a username (or a real name, e.g. "Maria Souza") on thousands of sites.
 
     Needs no API key and never contacts the person being searched. Example::
 

@@ -40,7 +40,7 @@ class Site:
     unclaimed: str | None = None
 
     @classmethod
-    def from_rule(cls, r: dict) -> "Site":
+    def from_rule(cls, r: dict) -> Site:
         tuples = ("presence", "absence", "error_codes", "error_strings", "known")
         return cls(**{k: tuple(v) if k in tuples else v for k, v in r.items() if k in cls.__dataclass_fields__})
 
@@ -68,14 +68,20 @@ def _bundled() -> dict:
 
 
 def _read_data() -> dict:
-    """Uses the list downloaded by `update_sites()` when present; otherwise the one bundled with the package."""
+    """Uses the list downloaded by `update_sites()` when it is newer than the one bundled with the package.
+
+    After upgrading Caramelo, the new bundled list wins over an older `--update` download.
+    """
+    bundled = _bundled()
     cached = cache_dir() / "sites.json"
     if cached.exists():
         try:
-            return json.loads(cached.read_text(encoding="utf-8"))
+            data = json.loads(cached.read_text(encoding="utf-8"))
+            if data.get("generated", "") >= bundled.get("generated", ""):
+                return data
         except (OSError, json.JSONDecodeError):
             pass
-    return _bundled()
+    return bundled
 
 
 def load_sites(categories: set[str] | None = None, sites: set[str] | None = None,
