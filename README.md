@@ -1,5 +1,9 @@
 # 🐕 CARAMELO
 
+<p align="center">
+  <img src="docs/banner.png" alt="Caramelo startup banner: a braille portrait of a caramelo dog inside a target-lock HUD" width="760">
+</p>
+
 **C**ross-platform **A**ccount **R**econ **A**nd **M**apping **E**ngine for **L**ocating **O**nline-identities
 
 *The Brazilian street dog that sniffs out everything.*
@@ -85,5 +89,7 @@ pytest -m network     # one test against the real GitHub API
 ```
 
 ## Credits and license
+
+The banner portrait was made from ["Caramelo Sargento Rex"](https://commons.wikimedia.org/wiki/File:Caramelo_%E2%80%9CSargento_Rex%E2%80%9D.jpg) by A209 (CC0, Wikimedia Commons). Regenerate the README image with `python scripts/render_banner.py`.
 
 Code under the MIT license. The site list (`src/caramelo/data/wmn-data.json`) comes from the [WhatsMyName](https://github.com/WebBreacher/WhatsMyName) project, © Micah Hoffman, under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).

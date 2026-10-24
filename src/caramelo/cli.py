@@ -8,7 +8,7 @@ from pathlib import Path
 from rich.console import Console
 from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn, TimeElapsedColumn
 
-from . import __version__
+from . import __version__, banner
 from .engine import investigate
 from .report import to_html, to_terminal
 from .sites import available_categories, load_sites, update_sites
@@ -30,10 +30,14 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--concurrency", type=int, default=50, help="simultaneous checks (default: 50)")
     p.add_argument("--categories", action="store_true", help="list the categories and exit")
     p.add_argument("--update", action="store_true", help="download the latest site list and exit")
+    p.add_argument("--no-banner", action="store_true", help="don't print the startup banner")
     p.add_argument("--version", action="version", version=f"caramelo {__version__}")
     a = p.parse_args(argv)
 
     err = Console(stderr=True)
+    # The banner goes to stderr, so `--json > file` stays clean even when it is shown.
+    if not (a.json or a.no_banner or a.categories):
+        banner.show(err, sites=len(load_sites()), version=__version__)
     if a.update:
         err.print(f"Site list updated: {update_sites()} sites.")
         return 0
