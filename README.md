@@ -19,11 +19,44 @@ caramelo johndoe --json > dossier.json
 
 ## Install
 
+Requires Python 3.10+.
+
+### As a command-line tool (recommended)
+
+Use [pipx](https://pipx.pypa.io), which installs Caramelo in its own isolated environment and puts the `caramelo` command on your PATH:
+
 ```bash
-pip install git+https://github.com/protonnegativo/caramelo
+pipx install git+https://github.com/protonnegativo/caramelo
 ```
 
-Requires Python 3.10+.
+Don't have pipx yet?
+
+| System | Install pipx |
+|---|---|
+| Debian / Ubuntu / Kali | `sudo apt install pipx && pipx ensurepath` |
+| Fedora | `sudo dnf install pipx && pipx ensurepath` |
+| Arch | `sudo pacman -S python-pipx && pipx ensurepath` |
+| macOS (Homebrew) | `brew install pipx && pipx ensurepath` |
+| Windows | `python -m pip install --user pipx && python -m pipx ensurepath` |
+
+Open a new terminal after `ensurepath`. To update later: `pipx upgrade caramelo-osint`.
+
+> **`error: externally-managed-environment`?** Recent Linux distributions (PEP 668) block `pip install` into the system Python. Use pipx as above, or a virtual environment as below. Avoid `--break-system-packages`.
+
+### As a library in your project
+
+Install it into your project's virtual environment:
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install git+https://github.com/protonnegativo/caramelo   # Windows: .venv\Scripts\pip
+```
+
+Or add it to your dependencies, e.g. in `pyproject.toml`:
+
+```toml
+dependencies = ["caramelo-osint @ git+https://github.com/protonnegativo/caramelo"]
+```
 
 ## How it works
 
